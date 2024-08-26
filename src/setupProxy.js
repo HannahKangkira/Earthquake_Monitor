@@ -12,8 +12,7 @@ module.exports = function (app) {
         })
     );
 }
-// http://118.113.105.29:8002/api/earlywarning/jsonPageList?orderType=1&pageNo=1&pageSize=20&userLat=0.0&userLng=0.0
-//http://118.113.105.29:8002/api/bulletin/jsonPageList?userLng=0.0&orderType=1&flag=SC&pageNo=1&pageSize=20&userLat=0.0
+
 /*  , createProxyMiddleware(
      {
          target: 'http://localhost:5001',
