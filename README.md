@@ -1,5 +1,5 @@
 # Earthquake Monitor
-My bachelor degree guaduate thesis.\
+My guaduate thesis.\
 Frontend ased on React & CesiumJS. Using Flask for a lightweight backend.\
 Maybe these codes are examples for solving some questions related to CesiumJS, especially heatmap feature.
 
