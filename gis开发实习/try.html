@@ -1,0 +1,485 @@
+创建的面要素可以显示但是创建的线要素无法显示
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Cesium 3D Tileset Example</title>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.103/Build/Cesium/Cesium.js"></script>
+    <link rel="stylesheet" href="https://cesium.com/downloads/cesiumjs/releases/1.103/Build/Cesium/Widgets/widgets.css">
+    <style>
+        #cesiumContainer {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+        }
+
+        #dropdown1 {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+        }
+
+        #dropdown2 {
+            position: absolute;
+            top: 10px;
+            left: 180px;
+            z-index: 1000;
+        }
+
+        #dropdown3 {
+            position: absolute;
+            top: 10px;
+            left: 360px;
+            z-index: 1000;
+        }
+
+        #light {
+            position: absolute;
+            top: 10px;
+            left: 550px;
+            z-index: 1000;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="cesiumContainer">
+        <select id="dropdown1">
+            <option value="option4">--点要素操作--</option>
+            <option value="option1" onclick="createPtsfromcoord()">输入经度与纬度创建点</option>
+            <option value="option2" onclick="createPtsfromloc()">由用户实际位置创建点</option>
+            <option value="option3" onclick="createPtsfrommouse()">交互式创建点</option>
+            <option value="option3" onclick="removeSelectedEntity()">删除点要素</option>
+            <option value="option3" onclick="downloadGeoJSON()">点要素导出为GeoJSON</option>
+        </select>
+        <select id="dropdown2">
+            <option value="option4">--线要素操作--</option>
+            <option value="option1" onclick="startDrawingPolyline()">开始交互化创建线要素</option>
+            <option value="option2" onclick="stopDrawingPolyline()">停止交互化创建线要素</option>
+            <option value="option3" onclick="exportPolylineToGeoJSON()">将线要素导出为GeoJSON</option>
+        </select>
+        <select id="dropdown3">
+            <option value="option1" onclick="">--面要素操作--</option>
+            <option value="option1" onclick="startDrawingPolygon()">开始绘制面要素</option>
+            <option value="option2" onclick="stopDrawingPolygon()">停止绘制面要素</option>
+            <option value="option3" onclick="exportPolygonToGeoJSON()">导出面要素为GeoJSON</option>
+        </select>
+        <button id="light" onclick="lightOnoff()">实际光照</button>
+    </div>
+
+    <script>
+        Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiIwY2RlMWJlZi0wNDc0LTRhOTAtYjNmYi1jYmNiZjRhMTY1ZTUiLCJpZCI6MTI3Mjg1LCJpYXQiOjE2Nzc5OTA3MDN9.YP86r9gy1eMVa87vABnYkwETSPWPJEqN9aQKXmQM2W8';
+
+        var viewer = new Cesium.Viewer('cesiumContainer', {
+            terrainProvider: Cesium.createWorldTerrain(),
+            animation: false,
+            timeline: false
+        });
+
+        var tileset = new Cesium.Cesium3DTileset({
+            url: Cesium.IonResource.fromAssetId(96188)
+        });
+
+        viewer.scene.primitives.add(tileset);
+
+        tileset.readyPromise.then(function (tileset) {
+            var date = new Date();
+            date.setHours(10);
+            viewer.clock.currentTime = Cesium.JulianDate.fromDate(date);
+
+            viewer.camera.flyTo({
+                destination: Cesium.Cartesian3.fromDegrees(103.695, 36.082, 2500),
+                orientation: {
+                    heading: Cesium.Math.toRadians(0),
+                    pitch: Cesium.Math.toRadians(-45),
+                    roll: 0.0
+                }
+            });
+        });
+        function lightOnoff() {
+            if (viewer.scene.globe.enableLighting == false) {
+                viewer.scene.globe.enableLighting = true
+                btn.value = "实际光照关"
+            } else {
+                viewer.scene.globe.enableLighting = false
+                btn.value = "实际光照开"
+            }
+        }
+
+        function createPtsfromloc() {
+            alert("请点击确认/allow 许可网页获取您的位置信息")
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition);
+            } else {
+                alert("该浏览器不支持获取当前地理位置！")
+            }
+            function showPosition(position) {
+                addPoint(position.coords.longitude, position.coords.latitude, position.coords.altitude)
+            }
+        }
+
+        const addPoint = (longi, lat, alt) => {
+            viewer.entities.add({
+                name: 'Point @' + longi + ',' + lat,
+                position: Cesium.Cartesian3.fromDegrees(longi, lat, alt),
+                point: {
+                    pixelSize: 8,
+                    color: Cesium.Color.RED,
+                    outlineColor: Cesium.Color.WHITE,
+                    outlineWidth: 2,
+                    pickable: true,
+                },
+                pickable: true,
+            })
+
+        }
+        function createPtsfromcoord() {
+            var long = prompt("请输入经度")
+            var lat = prompt("请输入纬度")
+            var alt = prompt("请输入海拔 否则默认取值为1500米")
+            if (long > 180 || lat > 90 || long < -180 || lat < -90) {
+                alert("地理坐标输入错误！")
+            } else {
+                if (alt == "") {
+                    alt = 1500
+                    addPoint(long, lat, alt)
+                } else {
+                    addPoint(long, lat, alt)
+                }
+            }
+        }
+        function createPtsfrommouse() {
+            var handler = new Cesium.ScreenSpaceEventHandler(viewer.canvas);
+            var isCreatingPoint = false; // 添加一个标志位来表示是否正在创建点
+
+            handler.setInputAction(function (event) {
+                if (!isCreatingPoint) { // 如果不在创建点的状态，则开始创建点
+                    isCreatingPoint = true;
+                    var windowPosition = event.position;
+                    var pickRay = viewer.camera.getPickRay(windowPosition);
+                    var cartesian = viewer.scene.globe.pick(pickRay, viewer.scene);
+                    if (cartesian) {
+                        var cartographic = Cesium.Cartographic.fromCartesian(cartesian);
+                        var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+                        var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+                        var altitude = viewer.scene.globe.getHeight(cartographic);
+                        addPoint(longitude, latitude, altitude);
+                    }
+                }
+            }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+        }
+        function downloadGeoJSON(filename, text) {
+            var blob = new Blob([text], { type: "application/json" });
+            var url = URL.createObjectURL(blob);
+
+            var link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        function exportPointsToGeoJSON() {
+            var geojson = {
+                type: "FeatureCollection",
+                features: []
+            };
+
+            var entities = viewer.entities.values;
+
+            for (var i = 0; i < entities.length; i++) {
+                var entity = entities[i];
+                if (entity.position) {
+                    var position = entity.position.getValue(viewer.clock.currentTime);
+                    var cartographic = Cesium.Cartographic.fromCartesian(position);
+                    var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+                    var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+                    var altitude = cartographic.height;
+
+                    var feature = {
+                        type: "Feature",
+                        geometry: {
+                            type: "Point",
+                            coordinates: [longitude, latitude, altitude]
+                        },
+                        properties: {
+                            name: "Point " + i
+                        }
+                    };
+                    geojson.features.push(feature);
+                }
+            }
+
+            var geojsonStr = JSON.stringify(geojson);
+            var filename = "points.geojson";
+
+            downloadGeoJSON(filename, geojsonStr);
+        }
+
+
+
+        var selectedEntity = null;
+
+        viewer.screenSpaceEventHandler.setInputAction(function (event) {
+            var pickedObject = viewer.scene.pick(event.position);
+            if (Cesium.defined(pickedObject) && pickedObject.id !== undefined) {
+                selectedEntity = pickedObject.id;
+            } else {
+                selectedEntity = null;
+            }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+        function removeSelectedEntity() {
+            if (selectedEntity !== null) {
+                viewer.entities.remove(selectedEntity);
+                selectedEntity = null;
+            }
+        }
+
+        var drawingPolyline = false;
+        var polylinePoints = [];
+
+        function startDrawingPolyline() {
+            polylinePoints = [];
+            drawingPolyline = true;
+        }
+
+        function stopDrawingPolyline() {
+            drawingPolyline = false;
+            console.log(polylinePoints);
+            createPolyline(polylinePoints);
+            polylinePoints = [];
+        }
+        function createPolyline(polylinePoints) {
+            // 导入地形数据源
+            var terrainProvider = Cesium.createWorldTerrain();
+
+            // 创建 Promise 数组以保存每个点的高程查询请求
+            var promises = [];
+
+            // 循环遍历 polylinePoints 数组并添加高程查询请求
+            for (var i = 0; i < polylinePoints.length; i += 2) {
+                var longitude = polylinePoints[i];
+                var latitude = polylinePoints[i + 1];
+
+                // 创建高程查询请求
+                var promise = Cesium.sampleTerrainMostDetailed(terrainProvider, [Cesium.Cartographic.fromDegrees(longitude, latitude)]);
+                promises.push(promise);
+            }
+
+            // 使用 Promise.all 来等待所有高程查询完成
+            Promise.all(promises).then(function (results) {
+                var positions = [];
+
+                // 循环遍历查询结果，获取真实海拔高度，并构建位置数组
+                for (var i = 0; i < results.length; i++) {
+                    var result = results[i][0];
+                    var altitude = result.height;
+
+                    var longitude = polylinePoints[i * 2];
+                    var latitude = polylinePoints[i * 2 + 1];
+
+                    positions.push(longitude, latitude, altitude);
+                }
+
+                // 创建线要素
+                viewer.entities.add({
+                    polyline: {
+                        positions: Cesium.Cartesian3.fromDegreesArrayHeights(positions),
+                        width: 3,
+                        material: Cesium.Color.BLUE
+                    }
+                });
+            });
+        }
+
+        viewer.screenSpaceEventHandler.setInputAction(function (event) {
+            if (drawingPolyline) {
+                var earthPosition = viewer.camera.pickEllipsoid(event.position, viewer.scene.globe.ellipsoid);
+                if (Cesium.defined(earthPosition)) {
+                    var cartographic = Cesium.Cartographic.fromCartesian(earthPosition);
+                    var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+                    var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+                    polylinePoints.push(longitude);
+                    polylinePoints.push(latitude);
+                }
+            }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+        function exportPolylineToGeoJSON() {
+            var geojson = {
+                type: "FeatureCollection",
+                features: []
+            };
+
+            var entities = viewer.entities.values;
+
+            for (var i = 0; i < entities.length; i++) {
+                var entity = entities[i];
+                if (entity.polyline) {
+                    var positions = entity.polyline.positions.getValue(viewer.clock.currentTime);
+                    var coordinates = [];
+                    for (var j = 0; j < positions.length; j++) {
+                        var cartographic = Cesium.Cartographic.fromCartesian(positions[j]);
+                        var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+                        var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+                        var altitude = cartographic.height;
+                        coordinates.push([longitude, latitude, altitude]);
+                    }
+
+                    var feature = {
+                        type: "Feature",
+                        geometry: {
+                            type: "LineString",
+                            coordinates: coordinates
+                        },
+                        properties: {
+                            name: "Line " + i
+                        }
+                    };
+
+                    geojson.features.push(feature);
+                }
+            }
+
+            var geojsonStr = JSON.stringify(geojson);
+            var filename = "line.geojson";
+
+            downloadGeoJSON(filename, geojsonStr);
+        }
+
+        function downloadGeoJSON(filename, text) {
+            var blob = new Blob([text], { type: "application/json" });
+            var url = URL.createObjectURL(blob);
+
+            var link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+
+        var drawingPolygon = false;
+        var polygonPoints = [];
+
+        function startDrawingPolygon() {
+            polygonPoints = [];
+            drawingPolygon = true;
+        }
+
+        function stopDrawingPolygon() {
+            drawingPolygon = false;
+            createPolygon(polygonPoints);
+            polygonPoints = [];
+        }
+
+        function createPolygon(points) {
+            if (points.length < 3) {
+                alert("至少需要三个点才能创建面要素");
+                return;
+            }
+
+            viewer.entities.add({
+                polygon: {
+                    hierarchy: Cesium.Cartesian3.fromDegreesArray(points),
+                    material: Cesium.Color.BLUE.withAlpha(0.5)
+                }
+            });
+        }
+
+        viewer.screenSpaceEventHandler.setInputAction(function (event) {
+            if (drawingPolygon) {
+                var earthPosition = viewer.camera.pickEllipsoid(event.position, viewer.scene.globe.ellipsoid);
+                if (Cesium.defined(earthPosition)) {
+                    var cartographic = Cesium.Cartographic.fromCartesian(earthPosition);
+                    var longitude = Cesium.Math.toDegrees(cartographic.longitude);
+                    var latitude = Cesium.Math.toDegrees(cartographic.latitude);
+                    polygonPoints.push(longitude);
+                    polygonPoints.push(latitude);
+                }
+            }
+        }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+        function downloadGeoJSON(filename, text) {
+            var blob = new Blob([text
+            ],
+                {
+                    type: "application/json"
+                });
+            var url = URL.createObjectURL(blob);
+
+            var link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", filename);
+
+            document.body.appendChild(link);
+
+            link.click();
+
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }
+        function exportPolygonToGeoJSON() {
+            if (polygonPoints.length < 6) { // 每个点由经度和纬度组成，所以至少需要6个值
+                alert("至少需要三个点才能导出面要素");
+                return;
+            }
+
+            var coordinates = [];
+            for (var i = 0; i < polygonPoints.length; i += 2) {
+                coordinates.push([polygonPoints[i], polygonPoints[i + 1]]);
+            }
+
+            var geojson = {
+                type: "FeatureCollection",
+                features: [
+                    {
+                        type: "Feature",
+                        geometry: {
+                            type: "Polygon",
+                            coordinates: [coordinates]
+                        }
+                    }
+                ]
+            };
+
+            var geojsonString = JSON.stringify(geojson, null, 2);
+            downloadGeoJSON("polygon.geojson", geojsonString);
+        }
+
+        function downloadGeoJSON(filename, data) {
+            var blob = new Blob([data], { type: "text/plain;charset=utf-8" });
+            if (navigator.msSaveBlob) {
+                // IE 10+
+                navigator.msSaveBlob(blob, filename);
+            } else {
+                // Other browsers
+                var link = document.createElement("a");
+                if (link.download !== undefined) {
+                    var url = URL.createObjectURL(blob);
+                    link.setAttribute("href", url);
+                    link.setAttribute("download", filename);
+                    link.style.visibility = "hidden";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                }
+            }
+        }
+
+    </script>
+</body>
+
+</html>

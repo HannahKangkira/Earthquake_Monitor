@@ -1,0 +1,66 @@
+{
+  "name": "earthquake",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@craco/craco": "^7.1.0",
+    "@dvgis/cesium-map": "^3.1.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.14.3",
+    "@mui/lab": "^5.0.0-alpha.140",
+    "@mui/material": "^5.14.8",
+    "@mui/x-date-pickers": "^6.11.1",
+    "@reduxjs/toolkit": "^1.9.5",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "apexcharts": "^3.41.1",
+    "canvas2image": "^1.0.5",
+    "cesium": "^1.108.0",
+    "cesium-heatmap": "^0.0.4",
+    "cesium-heatmap-es6": "^0.8.0",
+    "cesium-navigation": "^1.0.0",
+    "cesium-navigation-es6": "^3.0.8",
+    "craco-cesium": "^1.2.0",
+    "crypto": "^1.0.1",
+    "dayjs": "^1.11.9",
+    "heatmap.js": "^2.0.5",
+    "mysql": "^2.18.1",
+    "net": "^1.0.2",
+    "pubsub-js": "^1.9.4",
+    "react": "^18.2.0",
+    "react-apexcharts": "^1.4.1",
+    "react-dom": "^18.2.0",
+    "react-redux": "^8.1.2",
+    "react-scripts": "5.0.1",
+    "resium": "^1.17.1",
+    "sweetalert2": "^11.7.27",
+    "tls": "^0.0.1",
+    "web-vitals": "^2.1.4"
+  },
+  "scripts": {
+    "start": "craco start",
+    "build": "craco build",
+    "test": "craco test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}

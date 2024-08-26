@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>学生档案管理</title>
+    <style>
+        body {
+            background-color: #f2f2f2;
+            font-family: Arial, sans-serif;
+        }
+
+        #tabs {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #tabs ul {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #tabs ul li {
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        #tabs ul li a {
+            display: block;
+            padding: 10px 20px;
+            background-color: #f1f1f1;
+            text-decoration: none;
+            border-radius: 5px 5px 0 0;
+            color: #333333;
+        }
+
+        #tabs ul li a:hover {
+            background-color: #e1e1e1;
+        }
+
+        .tab-content {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        .tab-content h2 {
+            margin-top: 0;
+        }
+
+        /* 隐藏所有的选项卡内容 */
+        .tab-content>div {
+            display: none;
+        }
+
+        /* 显示当前选项卡的内容 */
+        .tab-content>div.active {
+            display: block;
+        }
+
+        #user-authorization table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        #user-authorization th,
+        #user-authorization td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #dddddd;
+        }
+
+        #user-authorization th {
+            background-color: #f1f1f1;
+        }
+
+        .authorize-btn {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            border: none;
+            border-radius: 3px;
+            color: #ffffff;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .authorize-btn:hover {
+            background-color: #45a049;
+        }
+
+        .form-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-container label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+
+        .form-container input[type="text"],
+        .form-container input[type="number"],
+        .form-container select,
+        .form-container textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #e1e1e1;
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+
+        .form-container input[type="submit"] {
+            background-color: #4CAF50;
+            color: #ffffff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .form-container input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .student-form {
+      margin-top: 20px;
+    }
+
+    .student-form label {
+      display: block;
+      margin-bottom: 8px;
+      color: #333333;
+    }
+
+    .student-form select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cccccc;
+      border-radius: 3px;
+      box-sizing: border-box;
+    }
+
+    .student-form button {
+      padding: 5px 10px;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 3px;
+      color: #ffffff;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .student-form button:hover {
+      background-color: #45a049;
+    }
+    #search-form {
+      margin-top: 20px;
+      text-align: center;
+    }
+
+    #search-form select {
+      padding: 8px;
+      border: 1px solid #cccccc;
+      border-radius: 3px;
+      font-size: 16px;
+    }
+
+    #search-form button {
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      border: none;
+      border-radius: 3px;
+      color: #ffffff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    </style>
+    <script>
+        // JavaScript代码以切换选项卡和显示相应的内容
+        function changeTab(tabId) {
+            // 隐藏所有的选项卡内容
+            var tabContents = document.getElementsByClassName("tab-content")[0].children;
+            for (var i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove("active");
+            }
+
+            // 显示当前选项卡的内容
+            var selectedTabContent = document.getElementById(tabId + "-content");
+            selectedTabContent.classList.add("active");
+        }
+        // JavaScript代码以填充学生档案修改表单
+    function populateStudentForm() {
+      var select = document.getElementById("student-select");
+      var selectedStudent = select.options[select.selectedIndex].text;
+
+      // 根据选中的学生填充表单，你可以根据实际情况自行修改
+      // 以下代码只是示例
+      var form = document.getElementById("student-form");
+      form.innerHTML = `
+        <label for="student-name">学生姓名:</label>
+        <input type="text" id="student-name" name="student-name" value="${selectedStudent}">
+
+        <label for="student-age">学生年龄:</label>
+        <input type="text" id="student-age" name="student-age">
+
+        <label for="student-gender">学生性别:</label>
+        <input type="text" id="student-gender" name="student-gender">
+
+        <button onclick="updateStudent()">修改</button>
+      `;
+    }
+
+    // JavaScript代码以模拟学生档案修改操作
+    function updateStudent() {
+      // 在这里执行学生档案修改操作，你可以根据实际情况自行修改
+      // 以下代码只是示例
+      var form = document.getElementById("student-form");
+      var studentName = document.getElementById("student-name").value;
+      var studentAge = document.getElementById("student-age").value;
+      var studentGender = document.getElementById("student-gender").value;
+
+      // 执行学生档案修改的逻辑
+      console.log("学生档案修改成功!");
+    }
+    // 新增的 JavaScript 代码
+    function viewStudentRecord() {
+      var selectedStudent = document.getElementById("student-select").value;
+      // 在这里执行查看学生档案的操作，可以根据 selectedStudent 的值进行相应的处理
+      // 例如，显示学生档案的详细信息或跳转到学生档案的单独页面
+    }
+    function exportStudentProfile() {
+      var studentId = document.getElementById("student-id").value;
+
+      // 执行导出学生档案的操作，这里仅作示例
+      console.log("导出学生档案，学生学号：" + studentId);
+      alert("成功导出学生档案，学生学号：" + studentId);
+    }
+    </script>
+</head>
+
+<body>
+    <!-- 学生档案管理界面 -->
+    <div id="tabs">
+        <ul>
+            <li><a href="#authorization" onclick="changeTab('authorization')">用户授权</a></li>
+            <li><a href="#new-student" onclick="changeTab('new-student')">新生档案录入</a></li>
+            <li><a href="#edit-student" onclick="changeTab('edit-student')">学生档案修改</a></li>
+            <li><a href="#search-student" onclick="changeTab('search-student')">学生档案查询</a></li>
+            <li><a href="#export-student" onclick="changeTab('export-student')">学生档案导出</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div id="authorization-content">
+                <h2>用户授权</h2>
+                <div id="user-authorization">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>用户名</th>
+                                <th>角色</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>用户1</td>
+                                <td>角色1</td>
+                                <td><button class="authorize-btn" onclick="authorizeUser('user1')">授权</button></td>
+                            </tr>
+                            <tr>
+                                <td>用户2</td>
+                                <td>角色2</td>
+                                <td><button class="authorize-btn" onclick="authorizeUser('user2')">授权</button></td>
+                            </tr>
+                            <!-- 在这里添加更多的用户行 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="new-student-content">
+                <h2>新生档案录入</h2>
+                <form>
+                    <label for="student-name">学生姓名:</label>
+                    <input type="text" id="student-name" name="student-name">
+
+                    <label for="student-age">年龄:</label>
+                    <input type="number" id="student-age" name="student-age">
+
+                    <label for="student-gender">性别:</label>
+                    <select id="student-gender" name="student-gender">
+                        <option value="male">男</option>
+                        <option value="female">女</option>
+                    </select>
+
+                    <label for="student-phone">联系电话:</label>
+                    <input type="tel" id="student-phone" name="student-phone">
+
+                    <label for="student-email">电子邮箱:</label>
+                    <input type="email" id="student-email" name="student-email">
+
+                    <label for="student-address">家庭地址:</label>
+                    <textarea id="student-address" name="student-address"></textarea>
+
+                    <input type="submit" value="提交审核">
+                </form>
+            </div>
+            <div id="edit-student-content">
+                <h2>学生档案修改</h2>
+                <form class="student-form" id="student-form">
+                    <label for="student-select">选择学生:</label>
+                    <select id="student-select" onchange="populateStudentForm()">
+                      <option value="student1">学生1</option>
+                      <option value="student2">学生2</option>
+                      <option value="student3">学生3</option>
+                      <!-- ... 添加更多学生选项 ... -->
+                    </select>
+          
+                    <!-- 学生档案修改表单将在此处动态填充 -->
+          
+                  </form>
+            </div>
+            <div id="search-student-content">
+                <h2>学生档案查询</h2>
+                <input type="text" id="student-id" placeholder="请输入学生学号">
+                <button onclick="viewStudentRecord()">查看</button>
+            </div>
+            <div id="export-student-content">
+                <h2>学生档案导出</h2>
+                <input type="text" id="student-id" placeholder="输入学号">
+                <input type="button" value="导出" onclick="exportStudentProfile()">
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
