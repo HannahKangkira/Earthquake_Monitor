@@ -117,7 +117,7 @@ def callback_api_query_shelter() -> dict:
     connection = pymysql.connect(
         host="localhost",  # 数据库主机地址
         user="backend",  # 数据库用户名
-        password="162534",  # 数据库密码
+        password="------",  # 数据库密码
         db="earthquake_monitor",  # 数据库名称
     )
     result_list = []
@@ -154,7 +154,7 @@ def callback_api_query_fault() -> dict:
     connection = pymysql.connect(
         host="localhost",  # 数据库主机地址
         user="backend",  # 数据库用户名
-        password="162534",  # 数据库密码
+        password="------",  # 数据库密码
         db="earthquake_monitor",  # 数据库名称
     )
     result_list = []
@@ -191,7 +191,7 @@ def callback_api_query_volcanoes() -> dict:
     connection = pymysql.connect(
         host="localhost",  # 数据库主机地址
         user="backend",  # 数据库用户名
-        password="162534",  # 数据库密码
+        password="------",  # 数据库密码
         db="earthquake_monitor",  # 数据库名称
     )
     result_list = []
@@ -225,7 +225,7 @@ def callback_api_query_boundary() -> dict:
     connection = pymysql.connect(
         host="localhost",  # 数据库主机地址
         user="backend",  # 数据库用户名
-        password="162534",  # 数据库密码
+        password="------",  # 数据库密码
         db="earthquake_monitor",  # 数据库名称
     )
 
@@ -267,7 +267,7 @@ def callback_api_report():
         connection = pymysql.connect(
             host="localhost",  # 数据库主机地址
             user="backend",  # 数据库用户名
-            password="162534",  # 数据库密码
+            password="------",  # 数据库密码
             db="earthquake_monitor",  # 数据库名称
         )
 
@@ -292,7 +292,7 @@ def callback_api_query_reports() -> dict:
     connection = pymysql.connect(
         host="localhost",  # 数据库主机地址
         user="backend",  # 数据库用户名
-        password="162534",  # 数据库密码
+        password="------",  # 数据库密码
         db="earthquake_monitor",  # 数据库名称
     )
     result_list = []
