@@ -3,7 +3,7 @@ My bachelor degree guaduate thesis.
 Frontend ased on React & CesiumJS. Using Flask for a lightweight backend.
 
 ### Reminder
-# Any data sources in the code files are for demonstration and testing only!
+### Any data sources in the code files are for demonstration and testing only!
 
 ### `npm start`
 Runs the app in the development mode.\
